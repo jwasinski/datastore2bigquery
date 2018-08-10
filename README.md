@@ -8,11 +8,11 @@ This script exports a Datastore kind to Cloud Storage, imports it into BigQuery 
 
 Usage:
 
-    ./datastore2bigquery.sh PROJECT KIND [BQDATASET]
+    ./datastore2bigquery.sh PROJECT KIND [BQDATASET] [LOCATION]
 
 Example:
 
-    ./datastore2bigquery.sh code-cooking Food
+    ./datastore2bigquery.sh code-cooking Food EU
 
 This script requires the `beta`, `bq` and `gsutil` gcloud components, so install those first if you haven't already:
 
