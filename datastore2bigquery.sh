@@ -16,18 +16,19 @@ fi
 PROJECT=$1
 if [ -n "${2:-}" ]; then KIND=$2; else echo "${RED}Please also specify a KIND$NC"; exit 1; fi
 if [ -n "${3:-}" ]; then BQDATASET=$3; else BQDATASET=datastore; fi
+if [ -n "${4:-}" ]; then LOCATION=$4; else LOCATION=US; fi	
 
 
 GCSPATH=gs://$PROJECT.appspot.com/datastore-$KIND-`date -u +"%Y-%m-%dT%H:%M:%SZ"`
 
 echo -e "${GREEN}Starting datastore export...$NC"
-gcloud beta datastore export --kinds="$KIND" --project=$PROJECT $GCSPATH
+gcloud beta datastore export --kinds="$KIND" --project=$PROJECT $GCSPATH 
 
 echo -e "${GREEN}Creating BigQuery dataset...$NC"
-bq mk -f $PROJECT:$BQDATASET
+bq mk --location=$LOCATION -f -d $PROJECT:$BQDATASET 
 
 echo -e "${GREEN}Loading export into BigQuery...$NC"
-bq load --source_format=DATASTORE_BACKUP $PROJECT:$BQDATASET.${KIND}_`date -u +"%Y%m%dT%H%M%SZ"` $GCSPATH/all_namespaces/kind_$KIND/all_namespaces_kind_$KIND.export_metadata
+bq load --location=$LOCATION --source_format=DATASTORE_BACKUP $PROJECT:$BQDATASET.${KIND}_`date -u +"%Y%m%dT%H%M%SZ"` $GCSPATH/all_namespaces/kind_$KIND/all_namespaces_kind_$KIND.export_metadata
 
 echo -e "${GREEN}Deleting backup files from Cloud Storage...$NC"
 gsutil rm -r $GCSPATH
